@@ -25,9 +25,7 @@ public class MailboxService {
         }
 
         if (!mailbox.isNewMail() && mailboxUpdate.isNewMail()){
-            List<LocalDateTime> history = mailbox.getMailHistory();
-            history.add(LocalDateTime.now());
-            mailbox.setMailHistory(history);
+            mailbox.getMailHistory().add(LocalDateTime.now());
         }
 
         mailbox.setAttemptedDeliveryNoticePresent(mailboxUpdate.isAttemptedDeliveryNoticePresent());

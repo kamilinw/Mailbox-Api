@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+    <p th:text="${'Hi ' + name}"></p>
+    <p>Thank you for registering. Please click on the below link to activate your account:</p>
+    <a th:href="${link}">Activate now!</a>
+    <p>Link will expire in 15 minutes.</p>
+    <p>See you soon</p>
+
+</body>
+</html>
