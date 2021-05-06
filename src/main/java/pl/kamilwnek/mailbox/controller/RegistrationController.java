@@ -1,6 +1,6 @@
 package pl.kamilwnek.mailbox.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -9,16 +9,12 @@ import pl.kamilwnek.mailbox.service.RegistrationService;
 
 import javax.validation.Valid;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "registration")
 public class RegistrationController {
 
     private final RegistrationService registrationService;
-
-    @Autowired
-    public RegistrationController(RegistrationService registrationService) {
-        this.registrationService = registrationService;
-    }
 
     @PostMapping
     public String register(@RequestBody @Valid RegistrationRequest request){

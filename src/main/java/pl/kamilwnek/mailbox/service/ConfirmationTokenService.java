@@ -1,6 +1,6 @@
 package pl.kamilwnek.mailbox.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
 import pl.kamilwnek.mailbox.repository.ConfirmationTokenRepository;
@@ -8,15 +8,10 @@ import pl.kamilwnek.mailbox.repository.ConfirmationTokenRepository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Service
 public class ConfirmationTokenService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
-
-    @Autowired
-    public ConfirmationTokenService(ConfirmationTokenRepository confirmationTokenRepository) {
-        this.confirmationTokenRepository = confirmationTokenRepository;
-    }
-
 
     public void saveConfirmationToken(ConfirmationToken token){
         confirmationTokenRepository.save(token);

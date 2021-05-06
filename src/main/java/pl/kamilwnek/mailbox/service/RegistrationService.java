@@ -1,6 +1,7 @@
 package pl.kamilwnek.mailbox.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.kamilwnek.mailbox.config.VerificationTokenConfig;
@@ -10,6 +11,8 @@ import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 
 import java.time.LocalDateTime;
 
+@Slf4j
+@AllArgsConstructor
 @Service
 public class RegistrationService {
 
@@ -17,17 +20,6 @@ public class RegistrationService {
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
     private final VerificationTokenConfig verificationTokenConfig;
-
-    @Autowired
-    public RegistrationService(EmailService emailService,
-                               UserService userService,
-                               ConfirmationTokenService confirmationTokenService,
-                               VerificationTokenConfig verificationTokenConfig) {
-        this.emailService = emailService;
-        this.userService = userService;
-        this.confirmationTokenService = confirmationTokenService;
-        this.verificationTokenConfig = verificationTokenConfig;
-    }
 
     public String register(RegistrationRequest request) {
         // user's username can not start with "mailbox" because its reserved for mailbox users
@@ -45,7 +37,7 @@ public class RegistrationService {
         );
 
         String link = verificationTokenConfig.getVerificationLinkPrefix() + token;
-        System.out.println("in RegistrationService.register(). sent link:" + link + " to " + request.getEmail());
+        log.info("in RegistrationService.register(). sent link:" + link + " to " + request.getEmail());
         emailService.send(request.getEmail(), buildEmail(request.getUsername(), link));
 
         return token;

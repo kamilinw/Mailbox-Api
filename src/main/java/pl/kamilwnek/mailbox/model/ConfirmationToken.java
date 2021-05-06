@@ -1,9 +1,15 @@
 package pl.kamilwnek.mailbox.model;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 public class ConfirmationToken {
 
@@ -36,9 +42,6 @@ public class ConfirmationToken {
     )
     private User user;
 
-    public ConfirmationToken() {
-    }
-
     public ConfirmationToken(String token,
                              LocalDateTime createdAt,
                              LocalDateTime expiresAt,
@@ -49,51 +52,4 @@ public class ConfirmationToken {
         this.user = user;
     }
 
-    public Long getTokenId() {
-        return tokenId;
-    }
-
-    public void setTokenId(Long tokenId) {
-        this.tokenId = tokenId;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getExpiresAt() {
-        return expiresAt;
-    }
-
-    public void setExpiresAt(LocalDateTime expiresAt) {
-        this.expiresAt = expiresAt;
-    }
-
-    public LocalDateTime getConfirmedAt() {
-        return confirmedAt;
-    }
-
-    public void setConfirmedAt(LocalDateTime confirmedAt) {
-        this.confirmedAt = confirmedAt;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

@@ -1,6 +1,6 @@
 package pl.kamilwnek.mailbox.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.kamilwnek.mailbox.dto.MailboxRequest;
 import pl.kamilwnek.mailbox.exception.IdNotFoundException;
@@ -11,18 +11,11 @@ import pl.kamilwnek.mailbox.repository.MailboxRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@AllArgsConstructor
 @Service
 public class MailboxService {
     private final UserService userService;
     private final MailboxRepository mailboxRepository;
-
-    @Autowired
-    public MailboxService(UserService userService, MailboxRepository mailboxRepository) {
-        this.userService = userService;
-        this.mailboxRepository = mailboxRepository;
-    }
-
-
 
     public Mailbox updateAll(Long id, MailboxRequest mailboxUpdate) {
         var mailbox = mailboxRepository.findById(id).orElse(null);

@@ -3,6 +3,7 @@ package pl.kamilwnek.mailbox.security.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,22 +22,13 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
 
+@AllArgsConstructor
 public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
     private final UserService userService;
-    @Autowired
-    public JwtUsernameAndPasswordAuthenticationFilter(AuthenticationManager authenticationManager,
-                                                      JwtConfig jwtConfig,
-                                                      SecretKey secretKey,
-                                                      UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtConfig = jwtConfig;
-        this.secretKey = secretKey;
-        this.userService = userService;
-    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {

@@ -1,8 +1,9 @@
 package pl.kamilwnek.mailbox.service;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +20,8 @@ import pl.kamilwnek.mailbox.security.jwt.JwtConfig;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j
+@AllArgsConstructor
 @Service
 public class UserService implements UserDetailsService {
 
@@ -28,21 +31,6 @@ public class UserService implements UserDetailsService {
     private final ConfirmationTokenService confirmationTokenService;
     private final MailboxRepository mailboxRepository;
     private final JwtConfig jwtConfig;
-
-
-    @Autowired
-    public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder,
-                       ConfirmationTokenService confirmationTokenService,
-                       MailboxRepository mailboxRepository,
-                       JwtConfig jwtConfig) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.confirmationTokenService = confirmationTokenService;
-        this.mailboxRepository = mailboxRepository;
-        this.jwtConfig = jwtConfig;
-    }
-
 
     @Override
     public User loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -111,6 +99,7 @@ public class UserService implements UserDetailsService {
 
         } catch (JSONException e) {
             e.printStackTrace();
+            log.error("Can't get username from token. Probably wrong token");
         }
 
         if (username.isBlank())

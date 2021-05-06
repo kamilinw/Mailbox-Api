@@ -1,7 +1,7 @@
 package pl.kamilwnek.mailbox.controller;
 
 import com.google.common.net.HttpHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.kamilwnek.mailbox.dto.MailboxRequest;
 import pl.kamilwnek.mailbox.model.Mailbox;
@@ -11,18 +11,13 @@ import pl.kamilwnek.mailbox.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/mailbox")
 public class MailboxController {
 
     private final MailboxService mailboxService;
     private final UserService userService;
-
-    @Autowired
-    public MailboxController(MailboxService mailboxService, UserService userService) {
-        this.mailboxService = mailboxService;
-        this.userService = userService;
-    }
 
 
     @PatchMapping(value = "/{whichMailbox}")
@@ -48,49 +43,49 @@ public class MailboxController {
         return mailboxService.getMailboxById(username, id);
     }
 
-    @GetMapping("/temperature/{id}")
+    @GetMapping("/{id}/temperature")
     public Double getTemperature(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                                  @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);
         return mailboxService.getTemperature(username, id);
     }
 
-    @GetMapping("/pressure/{id}")
+    @GetMapping("/{id}/pressure")
     public Double getPressure(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                               @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);
         return mailboxService.getPressure(username, id);
     }
 
-    @GetMapping("/humidity/{id}")
+    @GetMapping("/{id}/humidity")
     public Double getHumidity(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                               @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);
         return mailboxService.getHumidity(username, id);
     }
 
-    @GetMapping("/battery/{id}")
+    @GetMapping("/{id}/battery")
     public Double getBattery(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                              @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);
         return mailboxService.getBattery(username, id);
     }
 
-    @GetMapping("/history/{id}")
+    @GetMapping("/{id}/history")
     public List<LocalDateTime> getHistory(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                                           @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);
         return mailboxService.getHistory(username, id);
     }
 
-    @GetMapping("/new-mail/{id}")
+    @GetMapping("/{id}/new-mail")
     public boolean isNewMail(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                              @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);
         return mailboxService.isNewMail(username, id);
     }
 
-    @GetMapping("/notice/{id}")
+    @GetMapping("/{id}/notice")
     public boolean isNotice(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                             @PathVariable("id") Long id){
         String username = userService.getUsernameFromToken(authorizationHeader);

@@ -1,22 +1,18 @@
 package pl.kamilwnek.mailbox.controller;
 
 import com.google.common.net.HttpHeaders;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
 import pl.kamilwnek.mailbox.service.UserService;
 import javax.validation.Valid;
 
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "/api/user")
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/id")
     public Long getMailboxId(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,

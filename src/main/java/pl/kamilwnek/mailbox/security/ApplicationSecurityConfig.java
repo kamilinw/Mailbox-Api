@@ -1,5 +1,6 @@
 package pl.kamilwnek.mailbox.security;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ import javax.crypto.SecretKey;
 
 import static pl.kamilwnek.mailbox.security.ApplicationUserPermission.*;
 
-
+@AllArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -35,16 +36,6 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
 
-    @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder,
-                                     UserService userService,
-                                     JwtConfig jwtConfig,
-                                     SecretKey secretKey) {
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
-        this.jwtConfig = jwtConfig;
-        this.secretKey = secretKey;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
