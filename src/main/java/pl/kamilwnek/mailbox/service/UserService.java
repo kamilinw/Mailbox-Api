@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.kamilwnek.mailbox.dto.UserResponse;
 import pl.kamilwnek.mailbox.exception.NoMailboxForThisUserException;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
 import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
@@ -67,7 +68,7 @@ public class UserService implements UserDetailsService {
     }
 
     public String createMailbox(CreateMailboxRequest request, String header) {
-        var mailbox = new Mailbox();
+        var mailbox = new Mailbox(request.getName());
         mailboxRepository.save(mailbox);
 
         var mailboxUser = new User(
@@ -127,5 +128,12 @@ public class UserService implements UserDetailsService {
 
     public void saveUser(User user) {
         userRepository.save(user);
+    }
+
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null)
+            return null;
+        return new UserResponse(user.getUsername(),user.getEmail(),user.getMailboxes());
     }
 }

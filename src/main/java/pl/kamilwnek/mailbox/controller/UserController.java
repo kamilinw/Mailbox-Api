@@ -4,6 +4,7 @@ import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
+import pl.kamilwnek.mailbox.dto.UserResponse;
 import pl.kamilwnek.mailbox.service.UserService;
 import javax.validation.Valid;
 
@@ -23,6 +24,12 @@ public class UserController {
     @GetMapping("/username")
     public String getUsername(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
         return userService.getUsernameFromToken(authorizationHeader);
+    }
+
+    @GetMapping
+    public UserResponse getUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        return userService.getUserByUsername(username);
     }
 
     @PostMapping("/mailbox")

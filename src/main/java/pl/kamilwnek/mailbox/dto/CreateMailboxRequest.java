@@ -10,5 +10,6 @@ public class CreateMailboxRequest {
     @UniqueUsernameValue
     private final String username;
     private final String password;
+    private final String name;
 
 }

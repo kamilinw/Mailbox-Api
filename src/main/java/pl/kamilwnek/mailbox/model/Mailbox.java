@@ -27,7 +27,7 @@ public class Mailbox {
     )
     private Long mailboxId;
     private boolean newMail;
-
+    private String name;
     @ElementCollection
     @CollectionTable(name="mailbox_mail_history", joinColumns = @JoinColumn(name = "mailbox_id"))
     @Column(name = "mail_history") // 3
@@ -46,5 +46,7 @@ public class Mailbox {
     @JsonIgnore
     private List<User> users;
 
-
+    public Mailbox(String name) {
+        this.name = name;
+    }
 }
