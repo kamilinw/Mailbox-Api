@@ -1,3 +1,3 @@
 # mailbox
 
-Api for notifying users about the received letter. 
+REST Api (Java, Spring, PostgreSQL) for notifying users about the received letter. 
