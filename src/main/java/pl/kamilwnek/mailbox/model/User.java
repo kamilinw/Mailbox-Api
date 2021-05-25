@@ -54,7 +54,7 @@ public class User implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "mailbox_id"))
     @JsonIgnore
-    private List<Mailbox> mailboxes;
+    private Set<Mailbox> mailboxes;
 
 
     public User(String username, String password, String email, ApplicationUserRole applicationUserRole) {
@@ -67,7 +67,7 @@ public class User implements UserDetails {
     public User(String username, String password, Mailbox mailbox, ApplicationUserRole applicationUserRole) {
         this.username = username;
         this.password = password;
-        this.mailboxes = List.of(mailbox);
+        this.mailboxes = Set.of(mailbox);
         this.applicationUserRole = applicationUserRole;
          isEnabled = true;
     }
@@ -91,7 +91,7 @@ public class User implements UserDetails {
 
     public void addMailbox(Mailbox mailbox){
         if (mailboxes.isEmpty()){
-            this.mailboxes = List.of(mailbox);
+            this.mailboxes = Set.of(mailbox);
             return;
         }
         mailboxes.add(mailbox);

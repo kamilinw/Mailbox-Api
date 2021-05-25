@@ -83,18 +83,18 @@ public class UserService implements UserDetailsService {
             if (passwordEncoder.matches(request.getPassword(), mailboxUser.getPassword())){
                 User user = userRepository.findByUsername(username);
                 if (user != null){
-                    List<Mailbox> mailboxList = user.getMailboxes();
+                    Set<Mailbox> mailboxList = user.getMailboxes();
                     User mailboxUserFinal = mailboxUser;
 
                     // check if user already have requested mailbox added to account
-                    if (mailboxList.stream().anyMatch(m -> m.getMailboxId().equals(mailboxUserFinal.getMailboxes().get(0).getMailboxId()))){
+                    if (mailboxList.stream().anyMatch(m -> m.getMailboxId().equals(mailboxUserFinal.getMailboxes().stream().findFirst().get().getMailboxId()))){
                         ObjectError objectError = new ObjectError("username", "Ten użytkownik już posiada tą skrzynkę");
                         BindingResult bindingResult = new MapBindingResult(emptyMap(), "MyObject");
                         bindingResult.addError(objectError);
                         throw new MethodArgumentNotValidException(null, bindingResult);
                     }
 
-                    user.addMailbox(mailboxUser.getMailboxes().get(0));
+                    user.addMailbox(mailboxUser.getMailboxes().stream().findFirst().orElse(null));
                     userRepository.save(user);
                     return "Added";
                 }
@@ -149,13 +149,13 @@ public class UserService implements UserDetailsService {
     public Long getMailboxId(String username, int whichMailbox) {
         var user = findUserByUsername(username);
 
-        List<Mailbox> mailboxes = user.getMailboxes();
+        Set<Mailbox> mailboxes = user.getMailboxes();
 
         if (whichMailbox >= mailboxes.size()){
             throw new NoMailboxForThisUserException("This user do not have this much mailboxes");
         }
 
-        return mailboxes.get(whichMailbox).getMailboxId();
+        return mailboxes.stream().findFirst().get().getMailboxId();
     }
 
     public User findUserByEmail(String email) {
@@ -175,7 +175,7 @@ public class UserService implements UserDetailsService {
 
     public UserResponse deleteMailbox(String username, Long id) {
         User user = userRepository.findByUsername(username);
-        List<Mailbox> mailboxList = user.getMailboxes();
+        Set<Mailbox> mailboxList = user.getMailboxes();
         mailboxList.removeIf(mailbox -> mailbox.getMailboxId().equals(id));
         user.setMailboxes(mailboxList);
         userRepository.saveAndFlush(user);
@@ -185,7 +185,7 @@ public class UserService implements UserDetailsService {
         if (mailbox != null){
             long usersCount = mailbox.getUsers().size();
             if (usersCount == 1){
-                User mailboxUser = mailbox.getUsers().get(0);
+                User mailboxUser = mailbox.getUsers().stream().findFirst().get();
 
                 mailboxRepository.delete(mailbox);
                 mailboxRepository.flush();

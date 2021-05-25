@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @Getter
@@ -44,7 +45,7 @@ public class Mailbox {
             joinColumns = @JoinColumn(name = "mailbox_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     @JsonIgnore
-    private List<User> users;
+    private Set<User> users;
 
     public Mailbox(String name) {
         this.name = name;

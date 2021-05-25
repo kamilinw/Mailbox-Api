@@ -10,6 +10,7 @@ import pl.kamilwnek.mailbox.repository.MailboxRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @Service
@@ -88,7 +89,7 @@ public class MailboxService {
             return null;
         }
         var currentUser = userService.findUserByUsername(username);
-        List<User> mailboxUsers = mailbox.getUsers();
+        Set<User> mailboxUsers = mailbox.getUsers();
 
         for (User mailboxUser: mailboxUsers) {
             if (mailboxUser.getUserId().equals(currentUser.getUserId()))
@@ -101,6 +102,6 @@ public class MailboxService {
         var currentUser = userService.findUserByUsername(username);
         var mailboxes = currentUser.getMailboxes();
 
-        return mailboxes.isEmpty() ? null : mailboxes.get(0);
+        return mailboxes.isEmpty() ? null : mailboxes.stream().findFirst().get();
     }
 }
