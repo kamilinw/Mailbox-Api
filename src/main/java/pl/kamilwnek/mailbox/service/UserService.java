@@ -4,12 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.core.MethodParameter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.*;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.client.HttpClientErrorException;
 import pl.kamilwnek.mailbox.dto.UserResponse;
 import pl.kamilwnek.mailbox.exception.NoMailboxForThisUserException;
+import pl.kamilwnek.mailbox.exception.WrongUsernameException;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
 import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
 import pl.kamilwnek.mailbox.model.Mailbox;
@@ -18,8 +23,12 @@ import pl.kamilwnek.mailbox.repository.MailboxRepository;
 import pl.kamilwnek.mailbox.repository.UserRepository;
 import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 import pl.kamilwnek.mailbox.security.jwt.JwtConfig;
+
+import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static java.util.Collections.emptyMap;
 
 @Slf4j
 @AllArgsConstructor
@@ -44,7 +53,7 @@ public class UserService implements UserDetailsService {
     }
 
     public String signUpUser(User user) {
-                String encodedPassword = passwordEncoder.encode(user.getPassword());
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
         userRepository.save(user);
@@ -67,19 +76,51 @@ public class UserService implements UserDetailsService {
         return userRepository.enableAppUser(username);
     }
 
-    public String createMailbox(CreateMailboxRequest request, String header) {
+    public String createMailbox(CreateMailboxRequest request, String username) throws MethodArgumentNotValidException {
+
+        User mailboxUser = userRepository.findByUsername(request.getUsername());
+
+        // check if mailbox user already exists
+        if (mailboxUser != null){
+
+            // password for existing mailbox user check
+            if (passwordEncoder.matches(request.getPassword(), mailboxUser.getPassword())){
+                User user = userRepository.findByUsername(username);
+                if (user != null){
+                    List<Mailbox> mailboxList = user.getMailboxes();
+                    User mailboxUserFinal = mailboxUser;
+
+                    // check if user already have requested mailbox added to account
+                    if (mailboxList.stream().anyMatch(m -> m.getMailboxId().equals(mailboxUserFinal.getMailboxes().get(0).getMailboxId()))){
+                        ObjectError objectError = new ObjectError("username", "Ten użytkownik już posiada tą skrzynkę");
+                        BindingResult bindingResult = new MapBindingResult(emptyMap(), "MyObject");
+                        bindingResult.addError(objectError);
+                        throw new MethodArgumentNotValidException(null, bindingResult);
+                    }
+
+                    user.addMailbox(mailboxUser.getMailboxes().get(0));
+                    userRepository.save(user);
+                    return "Added";
+                }
+            } else {
+                ObjectError objectError = new ObjectError("password", "Podane hasło jest błędne");
+                BindingResult bindingResult = new MapBindingResult(emptyMap(), "MyObject");
+                bindingResult.addError(objectError);
+                throw new MethodArgumentNotValidException(null, bindingResult);
+            }
+        }
+
         var mailbox = new Mailbox(request.getName());
         mailboxRepository.save(mailbox);
 
-        var mailboxUser = new User(
+        mailboxUser = new User(
                 request.getUsername(),
                 passwordEncoder.encode(request.getPassword()),
                 mailbox,
                 ApplicationUserRole.MAILBOX);
 
-        String currentUsername = getUsernameFromToken(header);
-        var currentUser = userRepository.findUserByUsername(currentUsername).orElseThrow(()->
-                new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, currentUsername)));
+        var currentUser = userRepository.findUserByUsername(username).orElseThrow(()->
+                new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, username)));
         currentUser.addMailbox(mailbox);
 
         userRepository.save(mailboxUser);
@@ -123,7 +164,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+        return userRepository.findByEmail(email);
     }
 
     public void saveUser(User user) {

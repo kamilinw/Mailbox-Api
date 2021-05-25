@@ -2,6 +2,7 @@ package pl.kamilwnek.mailbox.controller;
 
 import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
 import pl.kamilwnek.mailbox.dto.UserResponse;
@@ -34,9 +35,10 @@ public class UserController {
 
     @PostMapping("/mailbox")
     public String createMailbox(
-            @RequestBody @Valid CreateMailboxRequest createMailboxRequest,
-            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
-        return userService.createMailbox(createMailboxRequest,authorizationHeader);
+            @RequestBody CreateMailboxRequest createMailboxRequest,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws MethodArgumentNotValidException {
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        return userService.createMailbox(createMailboxRequest,username);
     }
 
 }

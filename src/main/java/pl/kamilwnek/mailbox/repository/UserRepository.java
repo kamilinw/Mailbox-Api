@@ -21,5 +21,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "SET a.isEnabled = TRUE WHERE a.username = ?1")
     int enableAppUser(String username);
 
-    User findUserByEmail(String email);
+    @Query("SELECT u FROM User u " +
+            "WHERE u.email = ?1")
+    User findByEmail(String email);
 }

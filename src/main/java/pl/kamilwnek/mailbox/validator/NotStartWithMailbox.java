@@ -9,9 +9,9 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueUsernameValidator.class)
-public @interface UniqueUsernameValue {
-    String message() default "Podana nazwa użytkownika już istnieje";
+@Constraint(validatedBy = NotStartWithMailboxValidator.class)
+public @interface NotStartWithMailbox {
+    String message() default "Nazwa użytkownika nie może zaczynać się od mailbox";
 
     Class<?>[] groups() default {};
 

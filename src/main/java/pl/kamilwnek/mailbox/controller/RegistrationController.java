@@ -21,7 +21,7 @@ public class RegistrationController {
         try{
             return registrationService.register(request);
         } catch (IllegalArgumentException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Registration failure", e.getCause());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Registration failure", e);
         }
     }
 

@@ -2,8 +2,10 @@ package pl.kamilwnek.mailbox.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import pl.kamilwnek.mailbox.config.VerificationTokenConfig;
@@ -27,11 +29,6 @@ public class RegistrationService {
     private final SpringTemplateEngine templateEngine;
 
     public String register(RegistrationRequest request) {
-        // user's username can not start with "mailbox" because its reserved for mailbox users
-        if (request.getUsername().startsWith("mailbox")){
-            throw new IllegalArgumentException("Username can not start with mailbox");
-        }
-
         String token = userService.signUpUser(
                 new User(
                         request.getUsername(),
