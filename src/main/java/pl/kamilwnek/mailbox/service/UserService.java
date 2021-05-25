@@ -4,17 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.core.MethodParameter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.client.HttpClientErrorException;
 import pl.kamilwnek.mailbox.dto.UserResponse;
 import pl.kamilwnek.mailbox.exception.NoMailboxForThisUserException;
-import pl.kamilwnek.mailbox.exception.WrongUsernameException;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
 import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
 import pl.kamilwnek.mailbox.model.Mailbox;
@@ -23,10 +20,9 @@ import pl.kamilwnek.mailbox.repository.MailboxRepository;
 import pl.kamilwnek.mailbox.repository.UserRepository;
 import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 import pl.kamilwnek.mailbox.security.jwt.JwtConfig;
-
-import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 
 import static java.util.Collections.emptyMap;
 
@@ -150,8 +146,7 @@ public class UserService implements UserDetailsService {
         return username;
     }
 
-    public Long getMailboxId(String authorizationHeader, int whichMailbox) {
-        String username = getUsernameFromToken(authorizationHeader);
+    public Long getMailboxId(String username, int whichMailbox) {
         var user = findUserByUsername(username);
 
         List<Mailbox> mailboxes = user.getMailboxes();
@@ -176,5 +171,29 @@ public class UserService implements UserDetailsService {
         if (user == null)
             return null;
         return new UserResponse(user.getUsername(),user.getEmail(),user.getMailboxes());
+    }
+
+    public UserResponse deleteMailbox(String username, Long id) {
+        User user = userRepository.findByUsername(username);
+        List<Mailbox> mailboxList = user.getMailboxes();
+        mailboxList.removeIf(mailbox -> mailbox.getMailboxId().equals(id));
+        user.setMailboxes(mailboxList);
+        userRepository.saveAndFlush(user);
+
+
+        Mailbox mailbox = mailboxRepository.findById(id).orElse(null);
+        if (mailbox != null){
+            long usersCount = mailbox.getUsers().size();
+            if (usersCount == 1){
+                User mailboxUser = mailbox.getUsers().get(0);
+
+                mailboxRepository.delete(mailbox);
+                mailboxRepository.flush();
+
+                userRepository.deleteById(mailboxUser.getUserId());
+                userRepository.flush();
+            }
+        }
+        return new UserResponse(user.getUsername(), user.getEmail(), user.getMailboxes());
     }
 }

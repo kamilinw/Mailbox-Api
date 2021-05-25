@@ -19,7 +19,8 @@ public class UserController {
     @GetMapping("/id")
     public Long getMailboxId(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
                              @RequestParam(value = "whichMailbox", required = false, defaultValue = "0") int whichMailbox){
-        return userService.getMailboxId(authorizationHeader, whichMailbox);
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        return userService.getMailboxId(username, whichMailbox);
     }
 
     @GetMapping("/username")
@@ -39,6 +40,14 @@ public class UserController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws MethodArgumentNotValidException {
         String username = userService.getUsernameFromToken(authorizationHeader);
         return userService.createMailbox(createMailboxRequest,username);
+    }
+
+    @DeleteMapping("/mailbox/{id}")
+    public UserResponse deleteMailbox(
+            @PathVariable("id") Long id,
+            @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        return userService.deleteMailbox(username, id);
     }
 
 }
