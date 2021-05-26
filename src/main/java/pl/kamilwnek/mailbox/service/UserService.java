@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import pl.kamilwnek.mailbox.dto.ChangeEmailRequest;
+import pl.kamilwnek.mailbox.dto.ChangePasswordRequest;
 import pl.kamilwnek.mailbox.dto.UserResponse;
 import pl.kamilwnek.mailbox.exception.NoMailboxForThisUserException;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
@@ -22,7 +24,6 @@ import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 import pl.kamilwnek.mailbox.security.jwt.JwtConfig;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Predicate;
 
 import static java.util.Collections.emptyMap;
 
@@ -94,9 +95,20 @@ public class UserService implements UserDetailsService {
                         throw new MethodArgumentNotValidException(null, bindingResult);
                     }
 
-                    user.addMailbox(mailboxUser.getMailboxes().stream().findFirst().orElse(null));
-                    userRepository.save(user);
-                    return "Added";
+                    Optional<Mailbox> mailbox = mailboxUser.getMailboxes().stream().findFirst();
+                    if (mailbox.isPresent()){
+                        Set<Mailbox> mailboxes = user.getMailboxes();
+                        mailboxes.add(mailbox.get());
+                        user.setMailboxes(mailboxes);
+                        userRepository.save(user);
+                        return "Added";
+                    } else {
+                        ObjectError objectError = new ObjectError("mailbox", "Nie znaleziono skrzynki");
+                        BindingResult bindingResult = new MapBindingResult(emptyMap(), "MyObject");
+                        bindingResult.addError(objectError);
+                        throw new MethodArgumentNotValidException(null, bindingResult);
+                    }
+
                 }
             } else {
                 ObjectError objectError = new ObjectError("password", "Podane hasło jest błędne");
@@ -195,5 +207,34 @@ public class UserService implements UserDetailsService {
             }
         }
         return new UserResponse(user.getUsername(), user.getEmail(), user.getMailboxes());
+    }
+
+    public UserResponse changeEmail(ChangeEmailRequest changeEmailRequest, String username) throws MethodArgumentNotValidException {
+        User user = userRepository.findByUsername(username);
+        if (user.getEmail().equals(changeEmailRequest.getOldEmail())){
+            user.setEmail(changeEmailRequest.getNewEmail());
+            userRepository.save(user);
+            return new UserResponse(user.getUsername(), user.getEmail(), user.getMailboxes());
+        } else {
+            ObjectError objectError = new ObjectError("oldEmail", "Podany email jest inny niż aktualny email użytkownika");
+            BindingResult bindingResult = new MapBindingResult(emptyMap(), "MyObject");
+            bindingResult.addError(objectError);
+            throw new MethodArgumentNotValidException(null, bindingResult);
+        }
+
+    }
+
+    public UserResponse changePassword(ChangePasswordRequest changePasswordRequest, String username) throws MethodArgumentNotValidException {
+        User user = userRepository.findByUsername(username);
+        if (passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())){
+            user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+            userRepository.save(user);
+            return new UserResponse(user.getUsername(), user.getEmail(), user.getMailboxes());
+        } else {
+            ObjectError objectError = new ObjectError("oldPassword", "Podane hasło jest inne niż aktualne hasło użytkownika");
+            BindingResult bindingResult = new MapBindingResult(emptyMap(), "MyObject");
+            bindingResult.addError(objectError);
+            throw new MethodArgumentNotValidException(null, bindingResult);
+        }
     }
 }
