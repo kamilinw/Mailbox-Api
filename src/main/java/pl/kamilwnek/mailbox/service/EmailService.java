@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import pl.kamilwnek.mailbox.config.VerificationTokenConfig;
 import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 @Slf4j
 @AllArgsConstructor
@@ -19,8 +20,8 @@ public class EmailService {
     @Async
     public void send(String to, String email) {
         try {
-            var mimeMessage = mailSender.createMimeMessage();
-            var helper = new MimeMessageHelper(mimeMessage, "utf-8");
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setText(email, true);
             helper.setTo(to);
             helper.setSubject("Confirm Your Email");

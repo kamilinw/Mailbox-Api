@@ -1,7 +1,6 @@
 package pl.kamilwnek.mailbox.controller;
 
 import com.google.common.net.HttpHeaders;
-import jdk.jfr.ContentType;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;

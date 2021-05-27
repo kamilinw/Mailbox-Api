@@ -55,9 +55,9 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user);
 
-        var token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
 
-        var confirmationToken = new ConfirmationToken(
+        ConfirmationToken confirmationToken = new ConfirmationToken(
                 token,
                 LocalDateTime.now(),
                 LocalDateTime.now().plusMinutes(15),
@@ -118,7 +118,7 @@ public class UserService implements UserDetailsService {
             }
         }
 
-        var mailbox = new Mailbox(request.getName());
+        Mailbox mailbox = new Mailbox(request.getName());
         mailboxRepository.save(mailbox);
 
         mailboxUser = new User(
@@ -127,7 +127,7 @@ public class UserService implements UserDetailsService {
                 mailbox,
                 ApplicationUserRole.MAILBOX);
 
-        var currentUser = userRepository.findUserByUsername(username).orElseThrow(()->
+        User currentUser = userRepository.findUserByUsername(username).orElseThrow(()->
                 new UsernameNotFoundException(String.format(USER_NOT_FOUND_MSG, username)));
         currentUser.addMailbox(mailbox);
 
@@ -138,11 +138,11 @@ public class UserService implements UserDetailsService {
     public String getUsernameFromToken(String authorizationHeader) {
         String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
         String[] chunks = token.split("\\.");
-        var decoder = Base64.getDecoder();
+        Base64.Decoder decoder = Base64.getDecoder();
 
-        var payload = new String(decoder.decode(chunks[1]));
+        String payload = new String(decoder.decode(chunks[1]));
         JSONObject payloadJson;
-        var username = "";
+        String username = "";
         try {
             payloadJson = new JSONObject(payload);
             username = payloadJson.getString("sub");
@@ -152,14 +152,14 @@ public class UserService implements UserDetailsService {
             log.error("Can't get username from token. Probably wrong token");
         }
 
-        if (username.isBlank())
+        if (username.isEmpty())
             throw new UsernameNotFoundException(String.format("Username from token %s not found",token));
 
         return username;
     }
 
     public Long getMailboxId(String username, int whichMailbox) {
-        var user = findUserByUsername(username);
+        User user = findUserByUsername(username);
 
         Set<Mailbox> mailboxes = user.getMailboxes();
 

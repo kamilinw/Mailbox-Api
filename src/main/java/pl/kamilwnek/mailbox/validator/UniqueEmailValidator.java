@@ -1,6 +1,7 @@
 package pl.kamilwnek.mailbox.validator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import pl.kamilwnek.mailbox.model.User;
 import pl.kamilwnek.mailbox.service.UserService;
 
 import javax.validation.ConstraintValidator;
@@ -16,7 +17,7 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmailValu
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        var user = userService.findUserByEmail(s);
+        User user = userService.findUserByEmail(s);
         return user == null;
     }
 }

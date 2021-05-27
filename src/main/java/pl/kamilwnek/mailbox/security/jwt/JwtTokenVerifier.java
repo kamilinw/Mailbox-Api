@@ -2,6 +2,7 @@ package pl.kamilwnek.mailbox.security.jwt;
 
 import com.google.common.base.Strings;
 import io.jsonwebtoken.*;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,9 +54,9 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
         // decode token and get username, expirationDay and authorities
         String[] chunks = token.split("\\.");
-        var decoder = Base64.getDecoder();
+        Base64.Decoder decoder = Base64.getDecoder();
 
-        var payload = new String(decoder.decode(chunks[1]));
+        String payload = new String(decoder.decode(chunks[1]));
         JSONObject payloadJson;
         String username = null;
         Date exp = null;
@@ -64,9 +65,11 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
             payloadJson = new JSONObject(payload);
             username = payloadJson.getString("sub");
             exp = new Date(payloadJson.getLong("exp")*1000);
-            var array = payloadJson.getJSONArray(AUTHORITIES);
+            JSONArray array = payloadJson.getJSONArray(AUTHORITIES);
             for (int i = 0; i < array.length(); i++) {
-                authorities.add(Map.of(AUTHORITY,array.getJSONObject(i).getString(AUTHORITY)));
+                Map<String, String> map = new HashMap<>();
+                map.put(AUTHORITY,array.getJSONObject(i).getString(AUTHORITY));
+                authorities.add(map);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -112,10 +115,10 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
                     .build()
                     .parseClaimsJws(token);
 
-            var body = claimsJws.getBody();
+            Claims body = claimsJws.getBody();
             String subject = body.getSubject();
 
-            var authoritiesList = (List<Map<String,String>>) body.get(AUTHORITIES);
+            List<Map<String,String>> authoritiesList = (List<Map<String,String>>) body.get(AUTHORITIES);
 
             Set<SimpleGrantedAuthority> simpleGrantedAuthorities = authoritiesList.stream()
                     .map(m -> new SimpleGrantedAuthority(m.get(AUTHORITY)))

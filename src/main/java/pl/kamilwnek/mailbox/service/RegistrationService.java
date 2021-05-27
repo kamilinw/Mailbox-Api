@@ -10,12 +10,14 @@ import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import pl.kamilwnek.mailbox.config.VerificationTokenConfig;
 import pl.kamilwnek.mailbox.dto.RegistrationRequest;
+import pl.kamilwnek.mailbox.model.ConfirmationToken;
 import pl.kamilwnek.mailbox.model.User;
 import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
@@ -48,7 +50,7 @@ public class RegistrationService {
 
     @Transactional
     public String confirm(String token) {
-        var confirmationToken = confirmationTokenService
+        ConfirmationToken confirmationToken = confirmationTokenService
                 .getToken(token)
                 .orElseThrow(() ->
                         new IllegalStateException("token not found"));

@@ -19,7 +19,7 @@ public class MailboxService {
     private final MailboxRepository mailboxRepository;
 
     public Mailbox updateAll(Long id, MailboxRequest mailboxUpdate) {
-        var mailbox = mailboxRepository.findById(id).orElse(null);
+        Mailbox mailbox = mailboxRepository.findById(id).orElse(null);
 
         if (mailbox == null){
             return null;
@@ -41,32 +41,32 @@ public class MailboxService {
 
 
     public Double getTemperature(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         return mailbox == null ? null : mailbox.getTemperature();
     }
 
     public Double getPressure(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         return mailbox == null ? null : mailbox.getPressure();
     }
 
     public Double getHumidity(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         return mailbox == null ? null : mailbox.getHumidity();
     }
 
     public Double getBattery(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         return mailbox == null ? null : mailbox.getBattery();
     }
 
     public List<LocalDateTime> getHistory(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         return mailbox == null ? null : mailbox.getMailHistory();
     }
 
     public boolean isNewMail(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         if (mailbox == null){
             throw new IdNotFoundException("Mailbox with this id not found");
         }
@@ -74,7 +74,7 @@ public class MailboxService {
     }
 
     public boolean isNotice(String username, Long id) {
-        var mailbox = getMailboxById(username, id);
+        Mailbox mailbox = getMailboxById(username, id);
         if (mailbox == null){
             throw new IdNotFoundException("Mailbox with this id not found");
         }
@@ -84,11 +84,11 @@ public class MailboxService {
 
 
     public Mailbox getMailboxById(String username, Long id) {
-        var mailbox = mailboxRepository.findById(id).orElse(null);
+        Mailbox mailbox = mailboxRepository.findById(id).orElse(null);
         if (mailbox == null){
             return null;
         }
-        var currentUser = userService.findUserByUsername(username);
+        User currentUser = userService.findUserByUsername(username);
         Set<User> mailboxUsers = mailbox.getUsers();
 
         for (User mailboxUser: mailboxUsers) {
@@ -99,8 +99,8 @@ public class MailboxService {
     }
 
     public Mailbox getFirstMailbox(String username) {
-        var currentUser = userService.findUserByUsername(username);
-        var mailboxes = currentUser.getMailboxes();
+        User currentUser = userService.findUserByUsername(username);
+        Set<Mailbox> mailboxes = currentUser.getMailboxes();
 
         return mailboxes.isEmpty() ? null : mailboxes.stream().findFirst().get();
     }

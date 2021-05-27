@@ -67,7 +67,7 @@ public class User implements UserDetails {
     public User(String username, String password, Mailbox mailbox, ApplicationUserRole applicationUserRole) {
         this.username = username;
         this.password = password;
-        this.mailboxes = Set.of(mailbox);
+        this.mailboxes = new HashSet<>(Collections.singletonList(mailbox));
         this.applicationUserRole = applicationUserRole;
          isEnabled = true;
     }
@@ -91,7 +91,7 @@ public class User implements UserDetails {
 
     public void addMailbox(Mailbox mailbox){
         if (mailboxes.isEmpty()){
-            this.mailboxes = Set.of(mailbox);
+            this.mailboxes = new HashSet<>(Collections.singletonList(mailbox));
             return;
         }
         mailboxes.add(mailbox);
