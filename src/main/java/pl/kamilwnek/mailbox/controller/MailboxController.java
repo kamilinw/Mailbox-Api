@@ -25,7 +25,8 @@ public class MailboxController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @RequestBody MailboxRequest mailboxRequest,
             @PathVariable("whichMailbox") int whichMailbox){
-        Long id = userService.getMailboxId(authorizationHeader,whichMailbox);
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        Long id = userService.getMailboxId(username,whichMailbox);
         return mailboxService.updateAll(id, mailboxRequest);
     }
 
