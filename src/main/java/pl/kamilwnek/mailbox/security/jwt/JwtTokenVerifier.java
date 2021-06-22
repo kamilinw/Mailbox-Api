@@ -105,7 +105,6 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
             user.setToken(String.valueOf(token.hashCode()));
             response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
-            userService.saveUser(user);
         }
 
         // authenticate user
@@ -132,7 +131,11 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (JwtException e){
+            user.setToken(null);
             throw new IllegalStateException(String.format("Token %s cannot be trusted",token));
+        }
+        finally {
+            userService.saveUser(user);
         }
 
         filterChain.doFilter(request, response);

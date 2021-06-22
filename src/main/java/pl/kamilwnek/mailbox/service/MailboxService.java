@@ -9,6 +9,7 @@ import pl.kamilwnek.mailbox.model.User;
 import pl.kamilwnek.mailbox.repository.MailboxRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class MailboxService {
         }
 
         if (!mailbox.isNewMail() && mailboxUpdate.isNewMail()){
-            mailbox.getMailHistory().add(LocalDateTime.now());
+            mailbox.getMailHistory().add(LocalDateTime.now(ZoneOffset.UTC));
         }
 
         mailbox.setAttemptedDeliveryNoticePresent(mailboxUpdate.isAttemptedDeliveryNoticePresent());

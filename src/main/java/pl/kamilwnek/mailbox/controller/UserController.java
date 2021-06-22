@@ -13,22 +13,10 @@ import javax.validation.Valid;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = "/api/user")
+@RequestMapping(path = "/api/uzytkownik")
 public class UserController {
 
     private final UserService userService;
-
-    @GetMapping("/id")
-    public Long getMailboxId(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
-                             @RequestParam(value = "whichMailbox", required = false, defaultValue = "0") int whichMailbox){
-        String username = userService.getUsernameFromToken(authorizationHeader);
-        return userService.getMailboxId(username, whichMailbox);
-    }
-
-    @GetMapping("/username")
-    public String getUsername(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
-        return userService.getUsernameFromToken(authorizationHeader);
-    }
 
     @GetMapping
     public UserResponse getUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader){
@@ -44,7 +32,7 @@ public class UserController {
         return userService.changeEmail(changeEmailRequest, username);
     }
 
-    @PostMapping("/password")
+    @PostMapping("/haslo")
     public UserResponse changePassword(
             @RequestBody @Valid ChangePasswordRequest changePasswordRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws MethodArgumentNotValidException {
@@ -52,7 +40,7 @@ public class UserController {
         return userService.changePassword(changePasswordRequest, username);
     }
 
-    @PostMapping("/mailbox")
+    @PostMapping("/skrzynka")
     public String createMailbox(
             @RequestBody CreateMailboxRequest createMailboxRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) throws MethodArgumentNotValidException {
@@ -60,7 +48,7 @@ public class UserController {
         return userService.createMailbox(createMailboxRequest,username);
     }
 
-    @DeleteMapping("/mailbox/{id}")
+    @DeleteMapping("/skrzynka/{id}")
     public UserResponse deleteMailbox(
             @PathVariable("id") Long id,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {

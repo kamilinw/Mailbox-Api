@@ -11,7 +11,7 @@ import javax.validation.Valid;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = "registration")
+@RequestMapping(path = "rejestracja")
 public class RegistrationController {
 
     private final RegistrationService registrationService;
@@ -25,7 +25,7 @@ public class RegistrationController {
         }
     }
 
-    @GetMapping(path = "confirm")
+    @GetMapping(path = "/potwierdzenie")
     public String confirm(@RequestParam("token") String token){
         return registrationService.confirm(token);
     }
