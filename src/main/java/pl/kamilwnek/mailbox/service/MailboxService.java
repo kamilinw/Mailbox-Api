@@ -18,6 +18,7 @@ import java.util.Set;
 public class MailboxService {
     private final UserService userService;
     private final MailboxRepository mailboxRepository;
+    private final EmailService emailService;
 
     public Mailbox updateAll(Long id, MailboxRequest mailboxUpdate) {
         Mailbox mailbox = mailboxRepository.findById(id).orElse(null);
@@ -27,7 +28,13 @@ public class MailboxService {
         }
 
         if (!mailbox.isNewMail() && mailboxUpdate.isNewMail()){
-            mailbox.getMailHistory().add(LocalDateTime.now(ZoneOffset.UTC));
+            LocalDateTime dateTime = LocalDateTime.now(ZoneOffset.UTC);
+            mailbox.getMailHistory().add(dateTime);
+            emailService.sendEmail(
+                    "kamil.wnek97@gmail.com",
+                    emailService.buildNewLetterEmail(dateTime.toString()),
+                    "Otrzymano nowy list!"
+            );
         }
 
         mailbox.setAttemptedDeliveryNoticePresent(mailboxUpdate.isAttemptedDeliveryNoticePresent());
