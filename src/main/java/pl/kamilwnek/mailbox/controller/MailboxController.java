@@ -4,9 +4,12 @@ import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.kamilwnek.mailbox.dto.MailboxRequest;
+import pl.kamilwnek.mailbox.dto.SubscribeEmailRequest;
 import pl.kamilwnek.mailbox.model.Mailbox;
 import pl.kamilwnek.mailbox.service.MailboxService;
 import pl.kamilwnek.mailbox.service.UserService;
+
+import javax.validation.Valid;
 
 @AllArgsConstructor
 @RestController

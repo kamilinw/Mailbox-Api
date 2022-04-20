@@ -4,10 +4,8 @@ import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import pl.kamilwnek.mailbox.dto.ChangeEmailRequest;
-import pl.kamilwnek.mailbox.dto.ChangePasswordRequest;
-import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
-import pl.kamilwnek.mailbox.dto.UserResponse;
+import pl.kamilwnek.mailbox.dto.*;
+import pl.kamilwnek.mailbox.model.Mailbox;
 import pl.kamilwnek.mailbox.service.UserService;
 import javax.validation.Valid;
 
@@ -56,4 +54,15 @@ public class UserController {
         return userService.deleteMailbox(username, id);
     }
 
+    @PostMapping("/skrzynka/{id}/subscribeemail")
+    public Mailbox subscribeEmail(@RequestBody @Valid SubscribeEmailRequest subscribeEmailRequest,
+                                  @PathVariable("id") Long id){
+        return userService.subscribeEmail(id, subscribeEmailRequest);
+    }
+
+    @DeleteMapping("/skrzynka/{id}/subscribeemail")
+    public Mailbox unsubscribeEmail(@RequestBody @Valid SubscribeEmailRequest subscribeEmailRequest,
+                                  @PathVariable("id") Long id){
+        return userService.unsubscribeEmail(id, subscribeEmailRequest);
+    }
 }

@@ -29,8 +29,8 @@ import static pl.kamilwnek.mailbox.security.ApplicationUserPermission.*;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private static final String USER_PATTERN = "/api/user/**";
-    private static final String MAILBOX_PATTERN = "/api/mailbox/**";
+    private static final String USER_PATTERN = "/api/uzytkownik/**";
+    private static final String MAILBOX_PATTERN = "/api/skrzynka/**";
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final JwtConfig jwtConfig;
