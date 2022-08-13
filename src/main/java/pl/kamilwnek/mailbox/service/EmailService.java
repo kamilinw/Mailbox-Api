@@ -90,10 +90,13 @@ public class EmailService {
         return templateEngine.process("email/email-template", context);
     }
 
-    public String buildNewLetterEmail(String date) {
+    public String buildNewLetterEmail(String date, Double temperature, Double humidity, Double pressure) {
         Context context = new Context();
         Map<String, Object> variables = new HashMap<>();
         variables.put("date", date);
+        variables.put("temperature", temperature);
+        variables.put("humidity", humidity);
+        variables.put("pressure", pressure);
         context.setVariables(variables);
 
         return templateEngine.process("email/new-letter-email-template", context);

@@ -13,6 +13,7 @@ import pl.kamilwnek.mailbox.repository.MailboxRepository;
 import pl.kamilwnek.mailbox.repository.SubscribeEmailRepository;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
@@ -39,7 +40,11 @@ public class MailboxService {
                     .map(SubscribeEmail::getEmail)
                     .forEach(email -> emailService.sendEmail(
                             email,
-                            emailService.buildNewLetterEmail(dateTime.toString()),
+                            emailService.buildNewLetterEmail(
+                                    dateTime.atZone(ZoneId.of("Europe/Warsaw")).toString(),
+                                    mailboxUpdate.getTemperature(),
+                                    mailboxUpdate.getHumidity(),
+                                    mailboxUpdate.getPressure()),
                             "Otrzymano nowy list!"
                     ));
         }
@@ -48,7 +53,7 @@ public class MailboxService {
         mailbox.setBattery(mailboxUpdate.getBattery());
         mailbox.setNewMail(mailboxUpdate.isNewMail());
         mailbox.setTemperature(mailboxUpdate.getTemperature());
-        mailbox.setPressure(mailboxUpdate.getPressure());
+        mailbox.setPressure(mailboxUpdate.getPressure() * 100);
         mailbox.setHumidity(mailboxUpdate.getHumidity());
         mailboxRepository.save(mailbox);
         return mailbox;
