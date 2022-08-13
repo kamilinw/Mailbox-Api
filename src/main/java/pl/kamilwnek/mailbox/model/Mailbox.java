@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,12 @@ public class Mailbox {
     private Double temperature;
     private Double pressure;
     private Double humidity;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST},
+            fetch = FetchType.LAZY)
+    @JoinTable(name = "mailbox_subscribe_email",
+            joinColumns = @JoinColumn(name = "mailbox_id"),
+            inverseJoinColumns = @JoinColumn(name = "subscribe_email_id"))
+    private Set<SubscribeEmail> subscribeEmails;
 
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST},
             fetch = FetchType.LAZY)
@@ -49,5 +56,19 @@ public class Mailbox {
 
     public Mailbox(String name) {
         this.name = name;
+    }
+
+    public void addEmail(SubscribeEmail email) {
+        if (subscribeEmails.isEmpty()){
+            subscribeEmails = new HashSet<>();
+        }
+        subscribeEmails.add(email);
+    }
+
+    public void removeEmail(SubscribeEmail email) {
+        if (subscribeEmails.isEmpty()){
+            return;
+        }
+        subscribeEmails.remove(email);
     }
 }

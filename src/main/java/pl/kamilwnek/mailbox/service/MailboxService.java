@@ -1,12 +1,16 @@
 package pl.kamilwnek.mailbox.service;
 
+import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.kamilwnek.mailbox.dto.MailboxRequest;
+import pl.kamilwnek.mailbox.dto.SubscribeEmailRequest;
 import pl.kamilwnek.mailbox.exception.IdNotFoundException;
 import pl.kamilwnek.mailbox.model.Mailbox;
+import pl.kamilwnek.mailbox.model.SubscribeEmail;
 import pl.kamilwnek.mailbox.model.User;
 import pl.kamilwnek.mailbox.repository.MailboxRepository;
+import pl.kamilwnek.mailbox.repository.SubscribeEmailRepository;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -18,6 +22,8 @@ import java.util.Set;
 public class MailboxService {
     private final UserService userService;
     private final MailboxRepository mailboxRepository;
+    private final EmailService emailService;
+    private final SubscribeEmailRepository subscribeEmailRepository;
 
     public Mailbox updateAll(Long id, MailboxRequest mailboxUpdate) {
         Mailbox mailbox = mailboxRepository.findById(id).orElse(null);
@@ -27,7 +33,15 @@ public class MailboxService {
         }
 
         if (!mailbox.isNewMail() && mailboxUpdate.isNewMail()){
-            mailbox.getMailHistory().add(LocalDateTime.now(ZoneOffset.UTC));
+            LocalDateTime dateTime = LocalDateTime.now(ZoneOffset.UTC);
+            mailbox.getMailHistory().add(dateTime);
+            mailbox.getSubscribeEmails().stream()
+                    .map(SubscribeEmail::getEmail)
+                    .forEach(email -> emailService.sendEmail(
+                            email,
+                            emailService.buildNewLetterEmail(dateTime.toString()),
+                            "Otrzymano nowy list!"
+                    ));
         }
 
         mailbox.setAttemptedDeliveryNoticePresent(mailboxUpdate.isAttemptedDeliveryNoticePresent());

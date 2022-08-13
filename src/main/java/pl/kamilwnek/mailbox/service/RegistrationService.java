@@ -2,12 +2,8 @@ package pl.kamilwnek.mailbox.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
 import pl.kamilwnek.mailbox.config.VerificationTokenConfig;
 import pl.kamilwnek.mailbox.dto.RegistrationRequest;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
@@ -15,9 +11,6 @@ import pl.kamilwnek.mailbox.model.User;
 import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
@@ -28,7 +21,6 @@ public class RegistrationService {
     private final UserService userService;
     private final ConfirmationTokenService confirmationTokenService;
     private final VerificationTokenConfig verificationTokenConfig;
-    private final SpringTemplateEngine templateEngine;
 
     public String register(RegistrationRequest request) {
         String token = userService.signUpUser(
@@ -42,7 +34,10 @@ public class RegistrationService {
 
         String link = verificationTokenConfig.getVerificationLinkPrefix() + token;
         log.info("in RegistrationService.register(). sent link:" + link + " to " + request.getEmail());
-        emailService.send(request.getEmail(), buildEmail(request.getUsername(), link));
+        emailService.sendEmail(
+                request.getEmail(),
+                emailService.buildConfirmationEmail(request.getUsername(), link),
+                "Confirm Your Email");
 
         return token;
     }
@@ -68,16 +63,5 @@ public class RegistrationService {
         confirmationTokenService.setConfirmedAt(token);
         userService.enableAppUser(confirmationToken.getUser().getUsername());
         return "confirmed";
-    }
-
-    private String buildEmail(String name, String link) {
-        Context context = new Context();
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("name", name);
-        variables.put("link", link);
-        context.setVariables(variables);
-
-        return templateEngine.process("email/email-template", context);
-
     }
 }

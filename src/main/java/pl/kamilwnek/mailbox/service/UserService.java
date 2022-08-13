@@ -10,15 +10,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.*;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import pl.kamilwnek.mailbox.dto.ChangeEmailRequest;
-import pl.kamilwnek.mailbox.dto.ChangePasswordRequest;
-import pl.kamilwnek.mailbox.dto.UserResponse;
+import pl.kamilwnek.mailbox.dto.*;
+import pl.kamilwnek.mailbox.exception.IdNotFoundException;
 import pl.kamilwnek.mailbox.exception.NoMailboxForThisUserException;
 import pl.kamilwnek.mailbox.model.ConfirmationToken;
-import pl.kamilwnek.mailbox.dto.CreateMailboxRequest;
 import pl.kamilwnek.mailbox.model.Mailbox;
+import pl.kamilwnek.mailbox.model.SubscribeEmail;
 import pl.kamilwnek.mailbox.model.User;
 import pl.kamilwnek.mailbox.repository.MailboxRepository;
+import pl.kamilwnek.mailbox.repository.SubscribeEmailRepository;
 import pl.kamilwnek.mailbox.repository.UserRepository;
 import pl.kamilwnek.mailbox.security.ApplicationUserRole;
 import pl.kamilwnek.mailbox.security.jwt.JwtConfig;
@@ -34,6 +34,7 @@ public class UserService implements UserDetailsService {
 
     private static final String USER_NOT_FOUND_MSG = "user with username %s not found";
     private final UserRepository userRepository;
+    private final SubscribeEmailRepository subscribeEmailRepository;
     private final PasswordEncoder passwordEncoder;
     private final ConfirmationTokenService confirmationTokenService;
     private final MailboxRepository mailboxRepository;
@@ -236,5 +237,24 @@ public class UserService implements UserDetailsService {
             bindingResult.addError(objectError);
             throw new MethodArgumentNotValidException(null, bindingResult);
         }
+    }
+
+    public Mailbox subscribeEmail(Long id, SubscribeEmailRequest subscribeEmailRequest) {
+        Mailbox mailbox = mailboxRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Mailbox with this id not found"));
+        SubscribeEmail subscribeEmail = subscribeEmailRepository.findByEmail(subscribeEmailRequest.getEmail()).orElse(new SubscribeEmail());
+        subscribeEmail.setEmail(subscribeEmailRequest.getEmail());
+        subscribeEmailRepository.save(subscribeEmail);
+        mailbox.addEmail(subscribeEmail);
+        return mailboxRepository.save(mailbox);
+    }
+
+    public Mailbox unsubscribeEmail(Long id, SubscribeEmailRequest subscribeEmailRequest) {
+        Mailbox mailbox = mailboxRepository.findById(id).orElseThrow(()-> new IdNotFoundException("Mailbox with this id not found"));
+        SubscribeEmail subscribeEmail = subscribeEmailRepository
+                .findByEmail(subscribeEmailRequest.getEmail())
+                .orElseThrow(() -> new IdNotFoundException("Subscribe email with this id not found"));
+
+        mailbox.removeEmail(subscribeEmail);
+        return mailboxRepository.save(mailbox);
     }
 }
