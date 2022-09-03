@@ -1,10 +1,9 @@
 package pl.kamilwnek.mailbox.service;
 
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.kamilwnek.mailbox.dto.MailboxRequest;
-import pl.kamilwnek.mailbox.dto.SubscribeEmailRequest;
+import pl.kamilwnek.mailbox.dto.NewMailDistanceDto;
 import pl.kamilwnek.mailbox.exception.IdNotFoundException;
 import pl.kamilwnek.mailbox.model.Mailbox;
 import pl.kamilwnek.mailbox.model.SubscribeEmail;
@@ -50,11 +49,12 @@ public class MailboxService {
         }
 
         mailbox.setAttemptedDeliveryNoticePresent(mailboxUpdate.isAttemptedDeliveryNoticePresent());
-        mailbox.setBattery(mailboxUpdate.getBattery());
         mailbox.setNewMail(mailboxUpdate.isNewMail());
-        mailbox.setTemperature(mailboxUpdate.getTemperature());
-        mailbox.setPressure(mailboxUpdate.getPressure() * 100);
-        mailbox.setHumidity(mailboxUpdate.getHumidity());
+        if(mailboxUpdate.getBattery() != null) mailbox.setBattery(mailboxUpdate.getBattery());
+        if(mailboxUpdate.getNewMailDistance() != null) mailbox.setNewMailDistance(mailboxUpdate.getNewMailDistance());
+        if(mailboxUpdate.getTemperature() != null) mailbox.setTemperature(mailboxUpdate.getTemperature());
+        if(mailboxUpdate.getPressure() != null) mailbox.setPressure(mailboxUpdate.getPressure() * 100);
+        if(mailboxUpdate.getHumidity() != null) mailbox.setHumidity(mailboxUpdate.getHumidity());
         mailboxRepository.save(mailbox);
         return mailbox;
     }
@@ -68,6 +68,11 @@ public class MailboxService {
     public Double getPressure(String username, Long id) {
         Mailbox mailbox = getMailboxById(username, id);
         return mailbox == null ? null : mailbox.getPressure();
+    }
+
+    public NewMailDistanceDto getNewMailDistance(String username, Long id) {
+        Mailbox mailbox = getMailboxById(username, id);
+        return mailbox == null ? null : new NewMailDistanceDto(mailbox.getNewMailDistance());
     }
 
     public Double getHumidity(String username, Long id) {
@@ -123,5 +128,12 @@ public class MailboxService {
         Set<Mailbox> mailboxes = currentUser.getMailboxes();
 
         return mailboxes.isEmpty() ? null : mailboxes.stream().findFirst().get();
+    }
+
+    public NewMailDistanceDto updateNewMailDistance(Long id, NewMailDistanceDto newMailDistance) {
+        Mailbox mailbox = mailboxRepository.findById(id).orElseThrow(() -> new IdNotFoundException("Mailbox with id " + id + "not found"));
+        mailbox.setNewMailDistance(newMailDistance.getDistance());
+        mailboxRepository.save(mailbox);
+        return new NewMailDistanceDto(mailbox.getNewMailDistance());
     }
 }

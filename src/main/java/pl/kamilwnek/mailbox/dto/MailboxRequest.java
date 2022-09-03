@@ -15,4 +15,5 @@ public class MailboxRequest {
     private final Double temperature;
     private final Double pressure;
     private final Double humidity;
+    private final Double newMailDistance;
 }

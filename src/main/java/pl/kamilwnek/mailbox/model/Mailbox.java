@@ -39,6 +39,7 @@ public class Mailbox {
     private Double temperature;
     private Double pressure;
     private Double humidity;
+    private Double newMailDistance;
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.PERSIST},
             fetch = FetchType.LAZY)
     @JoinTable(name = "mailbox_subscribe_email",

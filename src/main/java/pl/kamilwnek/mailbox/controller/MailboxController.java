@@ -4,12 +4,10 @@ import com.google.common.net.HttpHeaders;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import pl.kamilwnek.mailbox.dto.MailboxRequest;
-import pl.kamilwnek.mailbox.dto.SubscribeEmailRequest;
+import pl.kamilwnek.mailbox.dto.NewMailDistanceDto;
 import pl.kamilwnek.mailbox.model.Mailbox;
 import pl.kamilwnek.mailbox.service.MailboxService;
 import pl.kamilwnek.mailbox.service.UserService;
-
-import javax.validation.Valid;
 
 @AllArgsConstructor
 @RestController
@@ -28,5 +26,23 @@ public class MailboxController {
         String username = userService.getUsernameFromToken(authorizationHeader);
         Long id = userService.getMailboxId(username,whichMailbox);
         return mailboxService.updateAll(id, mailboxRequest);
+    }
+
+    @GetMapping("/{whichMailbox}/new-mail-distance")
+    public NewMailDistanceDto getNewMailDistance(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+                                          @PathVariable("whichMailbox") int whichMailbox){
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        Long id = userService.getMailboxId(username,whichMailbox);
+        return mailboxService.getNewMailDistance(username, id);
+    }
+
+    @PostMapping("/{whichMailbox}/new-mail-distance")
+    public NewMailDistanceDto updateNewMailDistance(
+                    @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader,
+                    @PathVariable(value = "whichMailbox") Long whichMailbox,
+                    @RequestBody NewMailDistanceDto newMailDistance){
+        String username = userService.getUsernameFromToken(authorizationHeader);
+        Long id = userService.getMailboxId(username,whichMailbox.intValue());
+        return mailboxService.updateNewMailDistance(id, newMailDistance);
     }
 }
